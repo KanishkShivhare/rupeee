@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>
+    <%= title %>
+  </title>
+  <style>
+    #main {
+      height: 100%;
+      width: 100%;
+      overflow: hidden;
+    }
+
+    .top {
+      height: 15%;
+      width: 100%;
+    }
+
+    .mid {
+      height: 85%;
+      width: 100%;
+    }
+
+    #main .mid h5 {
+      color: rgb(140, 139, 139);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+      font-size: .77rem;
+    }
+
+    #main .mid h5 span {
+      color: blue;
+    }
+
+    .mid img:hover {
+      scale: 1.2;
+      transition: ease;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="main">
+    <div class="top" style="display: flex;justify-content: space-between;">
+      <img style="height: 10%; width: 10%;"
+        src="https://pbs.twimg.com/profile_images/1238970487369162752/Gm2_Hxem_400x400.png" alt="">
+      <div class="buy" style="display: flex; align-items: center; justify-content: center; padding: 0% 20%;">
+        <h1>50000₹/- </h1>
+        <button id="rzp-button1"
+          style="height: 50px; width: 120px; border: none; background-color: rgb(141, 214, 141); border-radius: 10px; margin: 20px;display: flex; justify-content: center; align-items: center;">
+          <h1>buy</h1>
+        </button>
+      </div>
+    </div>
+
+    <div class="mid" style="display: flex;">
+      <img style="height: 100%; width: 65%; "
+        src="https://www.royalenfield.com/content/dam/royal-enfield/india/motorcycles/classic-350/colors/studio-shots/dual-channel/new-dark-stealth-black/dark-stealth-black_0000.png"
+        alt="">
+      <h5>
+        Engine Type <br><span>4 Stroke, Air-Oil Cooled Engine,Spark Ignition, Single Cylinder</span>
+        <br>Displacement <br><span>349.34 cc</span>
+        <br>Max Torque <br><span>27 Nm @ 4000 rpm</span>
+        <br>No. of Cylinders <br><span>1</span>
+        <br>Cooling System <br><span>Air & Oil Cooled</span>
+        <br>Valve Per Cylinder <br><span>2</span>
+        <br>Starting <br><span>Self Start Only</span>
+        <br>Fuel Supply <br><span>Fuel Injection</span>
+        <br>Clutch <br><span>Wet, multi-plate</span>
+        <br>Ignition <br><span>Electronic Fuel Injection (EFI)</span>
+        <br>Gear Box <br><span>5 Speed</span>
+        <br>Bore <br><span>72 mm</span>
+        <br>Stroke <br><span>85.8 mm</span>
+        <br>Compression Ratio <br><span>9.5 : 1</span>
+        <br>Emission Typebs <br><span>6-2.0</span>
+      </h5>
+    </div>
+  </div>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <script>
+    var orderId;
+    $(document).ready(function () {
+      var settings = {
+        "url": "/create/orderId",
+        "method": "POST",
+        "timeout": 0,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "data": JSON.stringify({
+          "amount": "5000000"
+        }),
+      };
+
+      //creates new orderId everytime
+      $.ajax(settings).done(function (response) {
+
+        var options = {
+          "key": "rzp_test_xl4Oq7FNGxV6YL", // Enter the Key ID generated from the Dashboard
+          "amount": response.amount, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+          "currency": "INR",
+          "name": "Royal_Enfield",
+          "description": "Test Transaction",
+          "image": "https://pbs.twimg.com/profile_images/1238970487369162752/Gm2_Hxem_400x400.png",
+          "order_id": response.id, //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
+          "handler": function (response) {
+            var settings1 = {
+              "url": "/api/payment/verify",
+              "method": "POST",
+              "timeout": 0,
+              "headers": {
+                "Content-Type": "application/json"
+              },
+              "data": JSON.stringify({ response }),
+            }
+            $ajax(settings1).done(function (response) {
+              if (response == true) {
+                alert('payment sucessful')
+              } else {
+                alert('payment failed')
+              }              
+            })
+          },
+          "prefill": {
+            "name": "Gaurav Kumar",
+            "email": "gaurav.kumar@example.com",
+            "contact": "9000090000"
+          },
+          "notes": {
+            "address": "Razorpay Corporate Office"
+          },
+          "theme": {
+            "color": "#3399cc"
+          }
+        };
+        var rzp1 = new Razorpay(options);
+        rzp1.on('payment.failed', function (response) {
+          alert(response.error.code);
+          alert(response.error.description);
+          alert(response.error.source);
+          alert(response.error.step);
+          alert(response.error.reason);
+          alert(response.error.metadata.order_id);
+          alert(response.error.metadata.payment_id);
+        });
+        document.getElementById('rzp-button1').onclick = function (e) {
+          rzp1.open();
+          e.preventDefault();
+        }
+      });
+    });
+  </script>
+</body>
+
+</html>
+<!-- rzp_test_xl4Oq7FNGxV6YL -->
+<!-- 8v0LTeiH6lyb0wQoWkE7gzOv -->
